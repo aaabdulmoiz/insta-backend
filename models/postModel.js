@@ -13,14 +13,18 @@ const postSchema = mongoose.Schema(
       enum: ["Active", "Banned", "Deleted"],
       default: "Active",
     },
-    // heading,
-    // description
     content: {
       type: String,
       required: true,
     },
     image: {
       type: Buffer,
+    },
+    image_id: {
+      type: String,
+    },
+    image_url: {
+      type: String,
     },
     comments: [
       {

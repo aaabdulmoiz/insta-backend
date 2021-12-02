@@ -26,17 +26,9 @@ const logoutUser = async (req, res) => {
   }
 };
 
-const getUserInfo = async (req, res) => {
-  try {
-    const { author } = req.body;
-    const userPosts = await User.findById(author).populate("posts");
-    res.json({ userPosts });
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-};
+//
 
-module.exports = { registerUser, loginUser, logoutUser, getUserInfo };
+module.exports = { registerUser, loginUser, logoutUser };
 
 // const registerUser = async (req, res) => {
 //   try {
@@ -71,3 +63,13 @@ module.exports = { registerUser, loginUser, logoutUser, getUserInfo };
 //     res.json({ message: err.message });
 //   }
 // };
+
+// const getUserInfo = async (req, res) => {
+//     //   try {
+//     //     const { author } = req.body;
+//     //     const userPosts = await User.findById(author).populate("posts");
+//     //     res.json({ userPosts });
+//     //   } catch (err) {
+//     //     res.json({ message: err.message });
+//     //   }
+//     // };

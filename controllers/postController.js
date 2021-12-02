@@ -1,26 +1,16 @@
-const Post = require("../models/postModel");
-const User = require("../models/userModel");
 const {
-  createNewPost,
   addLike,
   deleteLike,
   getPosts,
+  uploadNewPost,
 } = require("../services/postServices");
 const { updateOneUser } = require("../services/userServices");
 const { validatePost } = require("../helpers/validateFields");
 
-const createPost = async (req, res, next) => {
+const uploadPost = async (req, res, next) => {
   try {
-    const { userId, content } = req.body;
-    const postQuery = { author: userId, content: content };
-    validatePost(req.body);
-    if (!req.cookies[userId]) {
-      // move on if no author cookies
-      throw new Error("Could not proceed with the request.");
-    }
-    const post = await createNewPost(postQuery);
-    await updateOneUser({ _id: userId }, { $push: { posts: post._id } });
-    res.json({ message: "Post created successfully." });
+    const post = await uploadNewPost(req);
+    res.json(post);
   } catch (err) {
     next(err);
   }
@@ -53,7 +43,7 @@ const dislikePost = async (req, res, next) => {
   }
 };
 
-module.exports = { createPost, getPost, likePost, dislikePost };
+module.exports = { getPost, likePost, dislikePost, uploadPost };
 
 // const getPosts = async (req, res) => {
 //   try {
@@ -67,5 +57,22 @@ module.exports = { createPost, getPost, likePost, dislikePost };
 //     res.json(post);
 //   } catch (err) {
 //     res.json({ message: err.message });
+//   }
+// };
+
+// const createPost = async (req, res, next) => {
+//   try {
+//     const { userId, content } = req.body;
+//     const postQuery = { author: userId, content: content };
+//     validatePost(req.body);
+//     if (!req.cookies[userId]) {
+//       // move on if no author cookies
+//       throw new Error("Could not proceed with the request.");
+//     }
+//     const post = await createNewPost(postQuery);
+//     await updateOneUser({ _id: userId }, { $push: { posts: post._id } });
+//     res.json({ message: "Post created successfully." });
+//   } catch (err) {
+//     next(err);
 //   }
 // };

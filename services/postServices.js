@@ -1,10 +1,29 @@
 const Post = require("../models/postModel");
+const cloudinary = require("../utils/cloudinary");
 
 const createNewPost = async (query) => {
   try {
     return await Post.create(query);
   } catch (err) {
     throw new Error("Could not create a post.");
+  }
+};
+
+const uploadNewPost = async (req) => {
+  try {
+    console.log(req.file.path);
+    const image = await cloudinary.v2.uploader.upload(req.file.path);
+    const { public_id, secure_url } = image;
+    const { content, userId } = req.body;
+    const post = await Post.create({
+      author: userId,
+      content: content,
+      image_id: public_id,
+      image_url: secure_url,
+    });
+    return { message: "Post created successfully", post };
+  } catch (err) {
+    throw new Error("Could not create the post.");
   }
 };
 
@@ -55,4 +74,10 @@ const deleteLike = async (body) => {
   }
 };
 
-module.exports = { createNewPost, addLike, getPosts, deleteLike };
+module.exports = {
+  createNewPost,
+  addLike,
+  getPosts,
+  deleteLike,
+  uploadNewPost,
+};

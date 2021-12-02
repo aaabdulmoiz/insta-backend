@@ -6,11 +6,9 @@ const {
   registerUser,
   loginUser,
   logoutUser,
-  getUserInfo,
 } = require("../controllers/userController");
 
-router.route("/").post(registerUser).get(getUserInfo);
-// router.route("/posts").get(getUserInfo);
+router.route("/").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(logoutUser);
 

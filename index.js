@@ -18,7 +18,6 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 const upload = multer();
-
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors(corsOptions));

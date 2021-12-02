@@ -1,15 +1,11 @@
-const Post = require("../models/postModel");
-const Comment = require("../models/commentModal");
+const { addComment } = require("../services/commentServices");
 
-const createComment = async (req, res) => {
+const createComment = async (req, res, next) => {
   try {
-    const { text, userId, postId } = req.body;
-    let comment = await Comment.create({ author: userId, text: text });
-    await Comment.populate(comment, { path: "author" });
-    await Post.updateOne({ _id: postId }, { $push: { comments: comment._id } });
+    const comment = await addComment(req.body);
     res.json(comment);
   } catch (err) {
-    throw new Error({ message: "Could not create a comment." });
+    next(err);
   }
 };
 

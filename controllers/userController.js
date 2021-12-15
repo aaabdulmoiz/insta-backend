@@ -1,8 +1,9 @@
-const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
-const md5 = require("md5");
 const asyncHandler = require("express-async-handler");
-const { authenticateUser, createNewUser } = require("../services/userServices");
+const {
+  authenticateUser,
+  createNewUser,
+  getUsers,
+} = require("../services/userServices");
 
 const registerUser = asyncHandler(async (req, res) => {
   const newUser = await createNewUser(req.body);
@@ -11,15 +12,27 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const user = await authenticateUser(req.body);
-  res.cookie(user._id, user, {
-    expires: new Date(Date.now() + 60 * 1000),
+  res.cookie("insta_user", user, {
+    expires: new Date(Date.now() + 60 * 100000),
   });
   res.json(user);
 });
 
+const getChatUsers = async (req, res, next) => {
+  try {
+    const users = await getUsers({ _id: { $ne: req.body.userId } });
+    res.send(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const logoutUser = async (req, res) => {
   try {
+    console.log("heree");
+    console.log(req.cookies);
     res.clearCookie(req._id);
+    res.send({ message: "User logged out successfully." });
     //also delete token from client and route to login page
   } catch (err) {
     res.sendStatus(401);
@@ -28,7 +41,7 @@ const logoutUser = async (req, res) => {
 
 //
 
-module.exports = { registerUser, loginUser, logoutUser };
+module.exports = { registerUser, loginUser, logoutUser, getChatUsers };
 
 // const registerUser = async (req, res) => {
 //   try {

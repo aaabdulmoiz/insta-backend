@@ -4,11 +4,11 @@ const {
   getPosts,
   uploadNewPost,
 } = require("../services/postServices");
-const { updateOneUser } = require("../services/userServices");
 const { validatePost } = require("../helpers/validateFields");
 
 const uploadPost = async (req, res, next) => {
   try {
+    validatePost(req.body);
     const post = await uploadNewPost(req);
     res.json(post);
   } catch (err) {

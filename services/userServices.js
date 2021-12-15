@@ -56,6 +56,15 @@ const getUser = async (query) => {
   }
 };
 
+const getUsers = async (query) => {
+  try {
+    const checkUsers = await User.find(query).select("name");
+    return checkUsers;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
 const updateOneUser = async (query) => {
   try {
     const updatedUser = await User.updateOne(query);
@@ -68,6 +77,7 @@ const updateOneUser = async (query) => {
 module.exports = {
   createUser,
   getUser,
+  getUsers,
   updateOneUser,
   authenticateUser,
   createNewUser,

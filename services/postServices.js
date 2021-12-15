@@ -11,7 +11,6 @@ const createNewPost = async (query) => {
 
 const uploadNewPost = async (req) => {
   try {
-    console.log(req.file.path);
     const image = await cloudinary.v2.uploader.upload(req.file.path);
     const { public_id, secure_url } = image;
     const { content, userId } = req.body;

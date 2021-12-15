@@ -11,12 +11,12 @@ const protect = async (req, res, next) => {
     const decoded = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     console.log(decoded);
     // userid == uid
-    if (!req.cookies[decoded._id]) {
+    if (!req.cookies["insta_user"]) {
       //   means we dont have userinfo against this _id so we should now get it
       console.log("User not found in cookies");
       const userInfo = await User.findById(decoded._id).select("-password");
       //userInfo saved in cookies
-      res.cookie(decoded._id, userInfo, {
+      res.cookie("insta_user", userInfo, {
         expires: new Date(Date.now() + 60 * 1000),
       });
     }

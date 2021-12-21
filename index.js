@@ -19,7 +19,9 @@ const { notFound, errorHandler } = require("./middleware/errorhandler");
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoute");
+const chatRoutes = require("./routes/chatRoutes");
 const Message = require("./models/messageModal");
+const Chat = require("./models/chatModal");
 const cors = require("cors");
 const corsOptions = {
   origin: "*",
@@ -44,11 +46,6 @@ app.get("/deletecookie", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected with id ", socket.id);
   socket.on("send message", async (msg) => {
-    // const message = await Message.create({
-    //   sender: "6189208106625c87dd3ca58c",
-    //   recepient: "61891fc5c7deec8a7c90f94d",
-    //   message: msg.message,
-    // });
     socket.broadcast.emit("send message", {
       id: msg.id,
       message: msg.message,
@@ -56,16 +53,27 @@ io.on("connection", (socket) => {
   });
 
   socket.on("private message", async (msg) => {
-    socket.broadcast.emit(msg.recepient, msg);
+    try {
+      const { sender, recepient, message } = msg;
+      const newMessage = await Message.create({
+        sender: sender,
+        recepient: recepient,
+        message: message,
+      });
+      let query = {
+        members: { $all: [sender, recepient] },
+      };
+      let update = {
+        $push: { messages: newMessage._id },
+        members: [sender, recepient],
+      };
+      let options = { upsert: true, new: true, setDefaultsOnInsert: true };
+      await Chat.findOneAndUpdate(query, update, options);
+      socket.broadcast.emit(msg.recepient, msg);
+    } catch (err) {
+      console.log(err.message);
+    }
   });
-
-  //ill need to get userId from to user it here.
-  //   socket.on(`user-${userId}`, async (msg) => {
-  //     socket.broadcast.emit("send message", {
-  //       id: msg.id,
-  //       message: "hehehe",
-  //     });
-  //   });
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
@@ -77,11 +85,28 @@ io.on("connection", (socket) => {
   });
 });
 
+app.post("/oldchat", async (req, res, next) => {
+  try {
+    const { sender, recepient } = req.body;
+    const chat = await Chat.findOne({
+      members: { $all: [sender, recepient] },
+    }).populate("messages");
+    if (!chat) {
+      throw new Error("No messages found");
+    }
+    res.send(chat);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.use("/api/user", userRoutes);
 
 app.use("/api/posts", postRoutes);
 
 app.use("/api/comment", commentRoutes);
+
+app.use("/api/chat", chatRoutes);
 
 app.use(notFound);
 

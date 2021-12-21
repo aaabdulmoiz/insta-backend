@@ -9,7 +9,7 @@ const addComment = async (body) => {
     await Post.updateOne({ _id: postId }, { $push: { comments: comment._id } });
     return comment;
   } catch (err) {
-    throw new Error({ message: "Could not create a comment." });
+    throw new Error("Could not create a comment.");
   }
 };
 
